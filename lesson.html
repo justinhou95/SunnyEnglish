@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>English Study</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #fff;
+      color: #222;
+    }
+    .back {
+      font-size: 0.85rem;
+      color: #666;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+    .back:hover { text-decoration: underline; }
+    h1 { font-size: 1.4rem; margin: 0 0 20px; }
+    .word-list { list-style: none; padding: 0; margin: 0; }
+    .word-list li {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      gap: 12px;
+    }
+    .en { width: 110px; font-weight: bold; flex-shrink: 0; }
+    .zh { width: 80px; color: #555; flex-shrink: 0; }
+
+    button {
+      background: none;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      padding: 3px 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #444;
+    }
+    button:hover { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <a class="back" href="index.html">← Lessons</a>
+  <h1 id="title"></h1>
+  <ul class="word-list" id="list"></ul>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const num = parseInt(params.get("lesson")) || 1;
+
+    const script = document.createElement("script");
+    script.src = `data/lesson${num}.js`;
+    script.onload = () => render(window.lessonData);
+    script.onerror = () => {
+      document.getElementById("title").textContent = "Lesson not found";
+    };
+    document.head.appendChild(script);
+
+    function render(data) {
+      document.title = data.title;
+      document.getElementById("title").textContent = data.title;
+      const list = document.getElementById("list");
+      data.words.forEach(({ en, zh, pro, com }) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span class="en">${en}</span>
+          <span class="zh">${zh}</span>
+          <span class="zh">${pro}</span>
+          <span class="zh">${com}</span>
+          <button onclick="speak('${en}', this)">&#9654; 发音</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    const API_KEY = "824c2ef8-ac2e-4c70-9d03-d0d6d1b09e95";
+    const audioCache = {};
+
+    function mwAudioUrl(filename) {
+      let subdir;
+      if (filename.startsWith("bix"))    subdir = "bix";
+      else if (filename.startsWith("gg")) subdir = "gg";
+      else if (/^\d/.test(filename))     subdir = "number";
+      else                               subdir = filename[0];
+      return `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdir}/${filename}.mp3`;
+    }
+
+    async function speak(word, btn) {
+      if (audioCache[word]) { playAudio(audioCache[word], btn); return; }
+      btn.textContent = "...";
+      try {
+        const res = await fetch(
+          `https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${API_KEY}`
+        );
+        const data = await res.json();
+        const filename = data[0]?.hwi?.prs?.[0]?.sound?.audio;
+        if (!filename) throw new Error("no audio");
+        const url = mwAudioUrl(filename);
+        audioCache[word] = url;
+        playAudio(url, btn);
+      } catch {
+        btn.textContent = "▶ 发音";
+        alert(`No audio found for "${word}"`);
+      }
+    }
+
+    function playAudio(url, btn) {
+      const audio = new Audio(url);
+      btn.textContent = "...";
+      audio.play();
+      audio.onended = () => btn.textContent = "▶ 发音";
+    }
+  </script>
+</body>
+</html>

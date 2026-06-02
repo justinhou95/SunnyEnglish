@@ -1,5 +1,5 @@
 window.lessonData = {
-  title: "Lesson 1 – Food & Drinks",
+  title: "Lesson 1 - ABCD",
   words: [
     { en: "apple",  zh: "苹果", pro: "", com: "" },
     { en: "banana", zh: "香蕉", pro: "", com: "" },

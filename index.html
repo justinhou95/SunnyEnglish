@@ -31,12 +31,27 @@
 </head>
 <body>
   <h1>English Study</h1>
-  <ul>
-    <li><a href="lesson.html?lesson=1">Lesson 1 – Food &amp; Drinks <span class="sub">15 words</span></a></li>
-    <li><a href="lesson.html?lesson=2">Lesson 2 – Animals <span class="sub">15 words</span></a></li>
-    <li><a href="lesson.html?lesson=3">Lesson 3 – Home &amp; Family <span class="sub">15 words</span></a></li>
-    <li><a href="lesson.html?lesson=4">Lesson 4 – School &amp; Work <span class="sub">15 words</span></a></li>
-    <li><a href="lesson.html?lesson=5">Lesson 5 – Nature <span class="sub">15 words</span></a></li>
-  </ul>
+  <ul id="list"></ul>
+
+  <script>
+    const list = document.getElementById("list");
+    let num = 6;
+
+    function loadNext() {
+      const script = document.createElement("script");
+      script.src = `data/lesson${num}.js`;
+      script.onload = () => {
+        const { title, words } = window.lessonData;
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="lesson.html?lesson=${num}">${title} <span class="sub">${words.length} words</span></a>`;
+        list.appendChild(li);
+        num++;
+        loadNext();
+      };
+      document.head.appendChild(script);
+    }
+
+    loadNext();
+  </script>
 </body>
 </html>

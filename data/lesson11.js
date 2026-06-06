@@ -1,5 +1,5 @@
 window.lessonData = {
-  title: "2026-06-05 短音 /ʊ/ 鸣",
+  title: "2026-06-05 短音 /ʊ/ 乌",
   words: [
     { en: "book",   zh: "书",   pro: "不可",   com: "" },
     { en: "read",   zh: "读",   pro: "",   com: "" },

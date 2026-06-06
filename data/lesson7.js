@@ -1,5 +1,5 @@
 window.lessonData = {
-  title: "2026-06-03 中短元音 /æ/ 咬",
+  title: "2026-06-03 中短元音 /æ/ 哎",
   words: [
     { en: "lab",       zh: "实验室", pro: "赖不",    com: "" },
     { en: "bag",       zh: "包",    pro: "败哥",    com: "" },

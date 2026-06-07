@@ -1,5 +1,5 @@
 window.lessonData = {
-  title: "2026-06-06 长音 /ɜː/ 俄",
+  title: "2026-06-08 长音 /ɜː/ 俄",
   words: [
     { en: "Germany",  zh: "德国", pro: "折门你",   com: "" },
     { en: "mercy",    zh: "慈悲", pro: "么思义",   com: "" },

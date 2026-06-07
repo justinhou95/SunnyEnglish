@@ -1,5 +1,5 @@
 window.lessonData = {
-  title: "2026-06-06 短音 /ə/ 俄",
+  title: "2026-06-08 短音 /ə/ 俄",
   words: [
     { en: "America", zh: "美国", pro: "俄买瑞可", com: "" },
     { en: "address", zh: "地址", pro: "俄拽死",   com: "" },

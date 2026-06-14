@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Practice</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: sans-serif;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .nav-back {
+      font-size: 0.85rem;
+      color: #666;
+      text-decoration: none;
+    }
+    .nav-back:hover { text-decoration: underline; }
+    h1 { font-size: 1.1rem; margin: 0; flex: 1; }
+    .progress { font-size: 0.85rem; color: #888; white-space: nowrap; }
+
+    .card-row {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .card-wrap {
+      flex: 1;
+      perspective: 1000px;
+    }
+    .card {
+      width: 100%;
+      height: 220px;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.45s ease;
+    }
+    .card.flipped { transform: rotateY(180deg); }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+    }
+    .front { background: #f5f7ff; }
+    .card-back { background: #fff8f0; transform: rotateY(180deg); }
+
+    .zh   { font-size: 2.2rem; font-weight: bold; }
+    .pro  { font-size: 1.1rem; color: #666; }
+    .en   { font-size: 2.4rem; font-weight: bold; color: #333; }
+    .hint { font-size: 0.8rem; color: #aaa; margin-top: 4px; }
+
+    .btn-speak {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 auto 14px;
+      background: none;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      padding: 6px 18px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      color: #333;
+    }
+    .btn-speak:hover { background: #f0f0f0; }
+    .btn-speak:disabled { opacity: 0.35; cursor: default; }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding-bottom: 16px;
+    }
+    button {
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #333;
+    }
+    button:hover { background: #f5f5f5; }
+    button:disabled { opacity: 0.3; cursor: default; }
+    .btn-flip {
+      background: #4a6ef5;
+      color: #fff;
+      border-color: #4a6ef5;
+      padding: 10px 36px;
+    }
+    .btn-flip:hover { background: #3a5ee0; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <a class="nav-back" href="index.html">← Back</a>
+    <h1 id="title"></h1>
+    <span class="progress" id="progress"></span>
+  </div>
+
+  <button class="btn-speak" id="btn-speak" onclick="speak(words[idx].en, this)">&#9654; 发音</button>
+
+  <div class="card-row">
+    <div class="card-wrap">
+      <div class="card" id="card" onclick="flip()">
+        <div class="face front">
+          <div class="zh" id="zh"></div>
+          <div class="hint">点击翻转</div>
+        </div>
+        <div class="face card-back">
+          <div class="en"  id="en"></div>
+          <div class="pro" id="pro"></div>
+          <div class="hint">点击返回</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-prev" onclick="go(-1)">← 上一个</button>
+    <button class="btn-flip" onclick="flip()">翻转</button>
+    <button id="btn-next" onclick="go(1)">下一个 →</button>
+  </div>
+  <div style="text-align:center; margin-top: 8px;">
+    <button id="btn-order" onclick="toggleOrder()" style="font-size:0.8rem; padding: 6px 16px; color:#4a6ef5; border-color:#4a6ef5;">顺序</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const file = params.get("file");
+    const num  = parseInt(params.get("lesson")) || 1;
+
+    const script = document.createElement("script");
+    script.src = file ? `data/${file}.js` : `data/lesson${num}.js`;
+    script.onload = () => init(window.lessonData);
+    script.onerror = () => { document.getElementById("title").textContent = "Lesson not found"; };
+    document.head.appendChild(script);
+
+    let original = [], words = [], idx = 0, shuffled = false;
+
+    function init(data) {
+      document.title = data.title;
+      document.getElementById("title").textContent = data.title;
+      original = data.words;
+      words = [...original];
+      show();
+    }
+
+    function show() {
+      const w = words[idx];
+      document.getElementById("card").classList.remove("flipped");
+      document.getElementById("zh").textContent  = w.zh;
+      document.getElementById("pro").textContent = w.pro;
+      document.getElementById("en").textContent  = w.en;
+      document.getElementById("progress").textContent = `${idx + 1} / ${words.length}`;
+      document.getElementById("btn-prev").disabled = idx === 0;
+      document.getElementById("btn-next").disabled = idx === words.length - 1;
+      const speakBtn = document.getElementById("btn-speak");
+      speakBtn.textContent = "▶ 发音";
+      speakBtn.disabled = false;
+    }
+
+    function flip() {
+      document.getElementById("card").classList.toggle("flipped");
+    }
+
+    function go(dir) {
+      idx = Math.max(0, Math.min(words.length - 1, idx + dir));
+      show();
+    }
+
+    function toggleOrder() {
+      shuffled = !shuffled;
+      idx = 0;
+      if (shuffled) {
+        words = [...original];
+        for (let i = words.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [words[i], words[j]] = [words[j], words[i]];
+        }
+        document.getElementById("btn-order").textContent = "随机";
+      } else {
+        words = [...original];
+        document.getElementById("btn-order").textContent = "顺序";
+      }
+      show();
+    }
+
+    // --- Dictionary audio ---
+    const API_KEY = "824c2ef8-ac2e-4c70-9d03-d0d6d1b09e95";
+    const audioCache = {};
+
+    function mwAudioUrl(filename) {
+      let subdir;
+      if (filename.startsWith("bix"))    subdir = "bix";
+      else if (filename.startsWith("gg")) subdir = "gg";
+      else if (/^\d/.test(filename))     subdir = "number";
+      else                               subdir = filename[0];
+      return `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdir}/${filename}.mp3`;
+    }
+
+    async function speak(word, btn) {
+      if (audioCache[word]) { playAudio(audioCache[word], btn); return; }
+      btn.textContent = "...";
+      try {
+        const res = await fetch(
+          `https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${API_KEY}`
+        );
+        const data = await res.json();
+        const filename = data[0]?.hwi?.prs?.[0]?.sound?.audio;
+        if (!filename) throw new Error("no audio");
+        const url = mwAudioUrl(filename);
+        audioCache[word] = url;
+        playAudio(url, btn);
+      } catch {
+        btn.textContent = "▶ 发音";
+        alert(`No audio found for "${word}"`);
+      }
+    }
+
+    function playAudio(url, btn) {
+      const audio = new Audio(url);
+      btn.textContent = "...";
+      audio.play();
+      audio.onended = () => btn.textContent = "▶ 发音";
+    }
+  </script>
+</body>
+</html>

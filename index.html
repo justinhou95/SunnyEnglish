@@ -14,28 +14,74 @@
     }
     h1 { font-size: 1.4rem; margin-bottom: 20px; }
     ul { list-style: none; padding: 0; margin: 0; }
-    li { border-bottom: 1px solid #eee; }
-    a {
+    li {
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+    }
+    a.lesson-link {
       display: block;
+      flex: 1;
       padding: 10px 4px;
       text-decoration: none;
       color: #222;
     }
-    a:hover { background: #f9f9f9; }
+    a.lesson-link:hover { background: #f9f9f9; }
     .sub {
       font-size: 0.8rem;
       color: #888;
       margin-left: 6px;
     }
+    a.practice-btn {
+      display: inline-block;
+      padding: 4px 10px;
+      margin-right: 4px;
+      font-size: 0.78rem;
+      color: #4a6ef5;
+      border: 1px solid #4a6ef5;
+      border-radius: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    a.practice-btn:hover { background: #eef1ff; }
   </style>
 </head>
 <body>
-  <h1>English Study</h1>
-  <ul id="list"></ul>
+  <h2>English Study</h2>
+  <h1>Chapter 1: Alphabet (字母表)</h1>
+  <ul>
+    <li>
+      <a class="lesson-link" href="lesson.html?file=lesson_abcd">A B C D <span class="sub">12 words</span></a>
+      <a class="practice-btn" href="practice.html?file=lesson_abcd">复习</a>
+    </li>
+    <li>
+      <a class="lesson-link" href="lesson.html?file=lesson_efgh">E F G H <span class="sub">12 words</span></a>
+      <a class="practice-btn" href="practice.html?file=lesson_efgh">复习</a>
+    </li>
+    <li>
+      <a class="lesson-link" href="lesson.html?file=lesson_ijkl">I J K L <span class="sub">12 words</span></a>
+      <a class="practice-btn" href="practice.html?file=lesson_ijkl">复习</a>
+    </li>
+    <li>
+      <a class="lesson-link" href="lesson.html?file=lesson_mnop">M N O P <span class="sub">12 words</span></a>
+      <a class="practice-btn" href="practice.html?file=lesson_mnop">复习</a>
+    </li>
+    <li>
+      <a class="lesson-link" href="lesson.html?file=lesson_qrst">Q R S T <span class="sub">12 words</span></a>
+      <a class="practice-btn" href="practice.html?file=lesson_qrst">复习</a>
+    </li>
+    <li>
+      <a class="lesson-link" href="lesson.html?file=lesson_uvwxyz">U V W X Y Z <span class="sub">17 words</span></a>
+      <a class="practice-btn" href="practice.html?file=lesson_uvwxyz">复习</a>
+    </li>
+  </ul>
 
+  <h1>Chapter 2: Phonetic (音标)</h1>
+  <ul id="list"></ul>
   <script>
     const list = document.getElementById("list");
-    let num = 6;
+    let num = 1;
 
     function loadNext() {
       const script = document.createElement("script");
@@ -43,7 +89,10 @@
       script.onload = () => {
         const { title, words } = window.lessonData;
         const li = document.createElement("li");
-        li.innerHTML = `<a href="lesson.html?lesson=${num}">${title} <span class="sub">${words.length} words</span></a>`;
+        li.innerHTML = `
+          <a class="lesson-link" href="lesson.html?lesson=${num}">${title} <span class="sub">${words.length} words</span></a>
+          <a class="practice-btn" href="practice.html?lesson=${num}">复习</a>
+        `;
         list.appendChild(li);
         num++;
         loadNext();

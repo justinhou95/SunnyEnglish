@@ -51,10 +51,11 @@
 
   <script>
     const params = new URLSearchParams(location.search);
+    const file = params.get("file");
     const num = parseInt(params.get("lesson")) || 1;
 
     const script = document.createElement("script");
-    script.src = `data/lesson${num}.js`;
+    script.src = file ? `data/${file}.js` : `data/lesson${num}.js`;
     script.onload = () => render(window.lessonData);
     script.onerror = () => {
       document.getElementById("title").textContent = "Lesson not found";
